@@ -67,10 +67,16 @@ input[type=text]:focus,select:focus{outline:3px solid rgba(108,76,255,.35);borde
 @keyframes wig{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(14deg)}}
 @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#auth{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(14,10,31,.75);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}#auth .card{max-width:420px;width:100%;margin:0}
 </style></head><body><div class="w">
-<div class="hero"><span class="badge" id="mode"></span><h1>Жол <span class="wave">🧭</span></h1><p>Найди свой вуз и выбей грант. Покажем, куда реально поступить и что прокачать уже сейчас ✨</p>
+<div class="hero"><button class="btn" id="lo" style="display:none;float:right;padding:6px 14px">Выйти</button><span class="badge" id="mode"></span><h1>Жол <span class="wave">🧭</span></h1><p>Найди свой вуз и выбей грант. Покажем, куда реально поступить и что прокачать уже сейчас ✨</p>
 <div class="steps"><div class="st d" id="s1">1 · Анкета</div><div class="st" id="s2">2 · Шансы</div><div class="st" id="s3">3 · План</div></div></div>
 <nav id="nav"></nav><div id="v"></div></div>
+<div id="auth"><div class="card"><h2>Вход в Жол 🧭</h2>
+<div id="a1"><p class="mut">Войди, чтобы сохранить свой прогресс.</p><button class="btn p" id="gg" style="width:100%">Войти через Google</button><div class="mut" style="text-align:center;margin:12px 0">или по коду на почту</div><input type="text" id="em" inputmode="email" placeholder="you@gmail.com" autocomplete="email"><button class="btn p" id="sc" style="width:100%;margin-top:10px">Получить код</button></div>
+<div id="a2" style="display:none"><p class="mut">Введи код из письма</p><input type="text" id="cd" inputmode="numeric" autocomplete="one-time-code" placeholder="123456"><div class="row" style="margin-top:10px"><button class="btn" id="bk2">Назад</button><button class="btn p" id="vc">Войти</button></div></div>
+<div id="am" class="mut" style="margin-top:10px;color:var(--hi)"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 const CHK='16.11.2026';
 // v = сверено с источниками в интернете (в основном неофициальными), g = общие знания, обязательно проверить
@@ -228,4 +234,22 @@ function vAdmin(){
 }
 render();
 (async()=>{try{const u=await claude.use('user');owner=u?u.isOwner():false;sample=await claude.use('sample');render()}catch(e){}})();
+</script>
+<script>
+const SB_URL='https://kiprahzrotxaopvlduof.supabase.co',SB_KEY='sb_publishable_KpbCdC0B_H7DN3A_2kgrpQ_Jibh3UoM';
+(function(){
+ if(!window.supabase)return;
+ const A=document.getElementById('auth'),g=id=>document.getElementById(id);
+ const sb=supabase.createClient(SB_URL,SB_KEY);let email='';
+ const msg=t=>{g('am').textContent=t||''};
+ const step=n=>{g('a1').style.display=n===1?'block':'none';g('a2').style.display=n===2?'block':'none';msg('')};
+ const lo=v=>{g('lo').style.display=v?'inline-block':'none'};
+ sb.auth.getSession().then(({data})=>{if(data.session){A.style.display='none';lo(true)}else A.style.display='flex'});
+ sb.auth.onAuthStateChange((_e,s)=>{if(s){A.style.display='none';lo(true)}else{A.style.display='flex';step(1);lo(false)}});
+ g('lo').onclick=()=>sb.auth.signOut();
+ g('gg').onclick=async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error)msg(error.message)};
+ g('sc').onclick=async()=>{email=g('em').value.trim();if(!/^\S+@\S+\.\S+$/.test(email)){msg('Введи корректную почту');return}msg('Отправляю…');const{error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});if(error){msg('Не получилось: '+error.message);return}step(2);g('cd').focus();msg('Код отправлен на '+email)};
+ g('vc').onclick=async()=>{const token=g('cd').value.trim();if(!/^\d{6,10}$/.test(token)){msg('Введи код из письма');return}msg('Проверяю…');const{error}=await sb.auth.verifyOtp({email,token,type:'email'});if(error)msg('Код неверный или устарел')};
+ g('bk2').onclick=()=>step(1);
+})();
 </script></body></html>
