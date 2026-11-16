@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Жол — ИИ-навигатор поступления</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Unbounded:wght@600;800&display=swap">
+<style>
+:root{--bg:#f5f3ee;--card:#fffdf9;--ink:#1d2320;--mut:#69706b;--ac:#1f6b57;--ac2:#e3efe9;--bd:#e4e0d6;--hi:#b4561d;--hi2:#fbeee4;--sh:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(31,107,87,.06);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#121513;--card:#1a1f1c;--ink:#ecece6;--mut:#99a39d;--ac:#5cc4a1;--ac2:#1d2d27;--bd:#2a312d;--hi:#e58f5a;--hi2:#2e2119;--sh:none;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#121513;--card:#1a1f1c;--ink:#ecece6;--mut:#99a39d;--ac:#5cc4a1;--ac2:#1d2d27;--bd:#2a312d;--hi:#e58f5a;--hi2:#2e2119;--sh:none;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:820px;margin:0 auto;padding:20px 16px 40px}
+.hero{padding:22px 20px;border-radius:20px;background:linear-gradient(135deg,var(--ac),#2e8f74);color:#fff;margin-bottom:16px}
+.hero h1{font:700 28px/1.15 Georgia,"Times New Roman",serif;margin:0 0 6px;letter-spacing:-.3px}.hero p{margin:0;opacity:.9;font-size:15px}
+.badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.2);margin-bottom:10px}
+.steps{display:flex;gap:8px;margin:14px 0 0}.st{flex:1;font-size:12px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.14)}.st.d{background:rgba(255,255,255,.34)}
+nav{display:flex;gap:6px;margin:0 0 14px;overflow-x:auto;padding-bottom:2px}
+nav button,.btn{border:1px solid var(--bd);background:var(--card);color:var(--ink);padding:9px 15px;border-radius:12px;font:inherit;font-size:15px;cursor:pointer;white-space:nowrap}
+nav button.on,.btn.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.btn:disabled{opacity:.55;cursor:default}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+h2{font:700 18px/1.25 Georgia,serif;margin:0 0 8px}.mut{color:var(--mut);font-size:14px}
+#log{display:flex;flex-direction:column;gap:8px;min-height:220px;max-height:50vh;overflow-y:auto;margin-bottom:12px}
+.m{padding:10px 13px;border-radius:14px;max-width:88%;white-space:pre-wrap}.u{align-self:flex-end;background:var(--ac);color:#fff;border-bottom-right-radius:4px}.a{align-self:flex-start;background:var(--ac2);border-bottom-left-radius:4px}
+.row{display:flex;gap:8px}.row>*{min-width:0}
+input[type=text],select{flex:1;border:1px solid var(--bd);background:var(--card);color:var(--ink);padding:11px 12px;border-radius:12px;font:inherit;width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.chip{font-size:12px;padding:3px 10px;border-radius:99px;background:var(--ac2);color:var(--ac);border:1px solid transparent}
+.chip.hi{background:var(--hi2);color:var(--hi)}.chip.o{background:transparent;border-color:var(--bd);color:var(--mut)}
+.bar{height:9px;border-radius:9px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+label.ck{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--bd)}label.ck:last-child{border:0}
+ul.rq{margin:6px 0 8px;padding-left:18px}ul.rq li{margin:3px 0}a{color:var(--ac)}
+.pr h2{display:flex;justify-content:space-between;gap:8px}.fl{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.warn{background:var(--hi2);color:var(--hi);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+:root{--bg:#f3efff;--card:#fff;--ink:#1b1340;--mut:#6d6893;--ac:#6c4cff;--ac2:#ece8ff;--bd:#ddd5ff;--hi:#e0286f;--hi2:#ffe3ef;--sh:0 10px 30px rgba(108,76,255,.12);--g:linear-gradient(135deg,#6c4cff,#ff4d8d)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e0a1f;--card:#181233;--ink:#f4f1ff;--mut:#a59fcb;--ac:#9b8cff;--ac2:#251c4d;--bd:#33295f;--hi:#ff7ab0;--hi2:#3a1830;--sh:0 10px 30px rgba(0,0,0,.35)}}
+:root[data-theme=dark]{--bg:#0e0a1f;--card:#181233;--ink:#f4f1ff;--mut:#a59fcb;--ac:#9b8cff;--ac2:#251c4d;--bd:#33295f;--hi:#ff7ab0;--hi2:#3a1830;--sh:0 10px 30px rgba(0,0,0,.35)}
+body{font-family:Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(520px 320px at 95% -4%,rgba(255,77,141,.28),transparent),radial-gradient(520px 320px at -8% 6%,rgba(108,76,255,.30),transparent),var(--bg);background-attachment:fixed}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:26px 22px 20px;background:linear-gradient(120deg,#6c4cff,#ff4d8d,#ff9b3d,#6c4cff);background-size:300% 300%;animation:flow 10s ease infinite;box-shadow:0 18px 40px rgba(255,77,141,.28)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(2px);pointer-events:none}
+.hero::before{width:170px;height:170px;right:-40px;top:-50px;background:rgba(255,255,255,.22)}
+.hero::after{width:90px;height:90px;right:60px;bottom:-30px;background:rgba(255,225,77,.45)}
+.hero>*{position:relative;z-index:1}
+.hero h1{font-family:Unbounded,Georgia,sans-serif;font-weight:800;font-size:clamp(30px,9vw,44px);letter-spacing:-1px;margin:6px 0 8px}
+.wave{display:inline-block;animation:wig 3s ease-in-out infinite}
+.hero p{font-size:16px;font-weight:600;max-width:34ch}
+.badge{background:#ffe14d;color:#1b1340;font-weight:800;transform:rotate(-3deg);padding:4px 12px}
+.steps{gap:6px}.st{font-weight:800;font-size:12px;border-radius:99px;padding:7px 10px;text-align:center;background:rgba(255,255,255,.18)}.st.d{background:#fff;color:#6c4cff}
+nav{gap:8px;padding:2px 2px 8px}
+nav button,.btn{border-radius:99px;border:1.5px solid var(--bd);font-weight:700;transition:transform .15s,box-shadow .15s}
+nav button:hover,.btn:hover:not(:disabled){transform:translateY(-2px)}
+nav button:active,.btn:active{transform:scale(.96)}
+nav button.on,.btn.p{background:var(--g);border-color:transparent;color:#fff;box-shadow:0 8px 20px rgba(255,77,141,.32)}
+.card{border-radius:24px;border:1.5px solid var(--bd);padding:18px;animation:pop .4s both}
+.pr{transition:transform .2s}.pr:hover{transform:translateY(-3px) rotate(-.4deg)}
+h2{font-family:Unbounded,Georgia,sans-serif;font-weight:600;font-size:16px}
+#v>*{animation:pop .4s both}
+.m{border-radius:20px;font-weight:600}.u{background:var(--g);box-shadow:0 6px 16px rgba(255,77,141,.28)}.a{background:var(--ac2)}
+input[type=text],select{border-radius:16px;border:1.5px solid var(--bd);font-weight:600;padding:12px 14px}
+input[type=text]:focus,select:focus{outline:3px solid rgba(108,76,255,.35);border-color:var(--ac)}
+.chips .btn{padding:11px 16px;font-size:15px}
+.chip{font-weight:800;padding:4px 11px}.chip.hi{background:var(--hi2);color:var(--hi)}
+.bar{height:12px;background:var(--ac2)}.bar i{background:linear-gradient(90deg,#6c4cff,#ff4d8d,#ff9b3d)}
+.warn{background:#fff4c2;color:#6b5200;border-radius:18px;font-weight:600}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .warn{background:#3a3210;color:#ffe680}}
+:root[data-theme=dark] .warn{background:#3a3210;color:#ffe680}
+@keyframes flow{50%{background-position:100% 50%}}
+@keyframes wig{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(14deg)}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div class="w">
+<div class="hero"><span class="badge" id="mode"></span><h1>Жол <span class="wave">🧭</span></h1><p>Найди свой вуз и выбей грант. Покажем, куда реально поступить и что прокачать уже сейчас ✨</p>
+<div class="steps"><div class="st d" id="s1">1 · Анкета</div><div class="st" id="s2">2 · Шансы</div><div class="st" id="s3">3 · План</div></div></div>
+<nav id="nav"></nav><div id="v"></div></div>
+<script>
+const CHK='16.11.2026';
+// v = сверено с источниками в интернете (в основном неофициальными), g = общие знания, обязательно проверить
+const DB=[
+{id:'gks',n:'Global Korea Scholarship (GKS-U)',c:'Корея',l:'Бакалавриат',f:'Полное',v:'v',url:'https://www.studyinkorea.go.kr',
+ rq:['Возраст до 25 лет (по правилам цикла 2027)','Школа окончена; результат от 80% или топ 20% класса или 2,64 из 4,0','Не заканчивал школу в Корее','Рекомендации, медосмотр, пакет документов'],
+ tm:'Приём обычно осенью (сентябрь–октябрь), два трека: через посольство и через университет',
+ tip:'Держи средний балл выше 80%, учи корейский (TOPIK 5–6 снимает год языковой подготовки), собери рекомендации.'},
+{id:'tr',n:'Türkiye Bursları',c:'Турция',l:'Бакалавриат',f:'Полное',v:'v',url:'https://turkiyeburslari.gov.tr',
+ rq:['Аттестат о среднем образовании','Условия по возрасту и среднему баллу задаёт YTB','Только одна заявка за цикл','Курс турецкого в начале при необходимости'],
+ tm:'Окно обычно с 10 января по 20 февраля; даты 2027 официально не подтверждены на начало ноября 2026',
+ tip:'Готовь документы заранее и следи за порталом YTB, окно короткое.'},
+{id:'hu',n:'Stipendium Hungaricum',c:'Венгрия',l:'Бакалавриат',f:'Полное/частичное',v:'g',url:'https://stipendiumhungaricum.hu',
+ rq:['Аттестат, мотивационное письмо, подтверждение английского','Заявка через национального партнёра и портал'],
+ tm:'Обычно зимой (январь), уточнить на сайте',tip:'Подготовь мотивационное письмо и IELTS/TOEFL, сверь сроки на официальном сайте.'},
+{id:'csc',n:'Китайская правительственная стипендия (CSC)',c:'Китай',l:'Бакалавриат',f:'Полное/частичное',v:'g',url:'https://www.campuschina.org',
+ rq:['Аттестат, возраст и здоровье по правилам программы','Язык обучения: китайский (HSK) или английская программа'],
+ tm:'Обычно январь–апрель, два пути: через вуз и через посольство',tip:'Начни HSK или выбери английскую программу, собери портфолио достижений.'},
+{id:'mext',n:'MEXT (правительство Японии)',c:'Япония',l:'Бакалавриат',f:'Полное',v:'g',url:'https://www.studyinjapan.go.jp',
+ rq:['Ограничение по возрасту и школьному образованию','Экзамены по математике, английскому, а также японскому','Подача через посольство, обычно весной'],
+ tm:'Подача обычно весной, детали у посольства Японии',tip:'Усиль математику и английский, начни японский.'},
+{id:'nu',n:'Назарбаев Университет',c:'Казахстан',l:'Бакалавриат',f:'Гранты и финпомощь',v:'g',url:'https://nu.edu.kz',
+ rq:['Обучение на английском: нужен сертификат (IELTS/TOEFL)','Вступительные тесты и эссе','Сильный аттестат и достижения'],
+ tm:'Обычно подача зимой–весной, смотри календарь приёма на сайте',tip:'Подтяни английский и математику, начни собирать проекты и достижения.'},
+{id:'ent',n:'Госгрант по баллам ЕНТ',c:'Казахстан',l:'Бакалавриат',f:'Гос. грант',v:'g',url:'https://www.gov.kz',
+ rq:['ЕНТ в 11 классе','Конкурс по баллам, проходной зависит от вуза и специальности и меняется каждый год'],
+ tm:'ЕНТ сдают в 11 классе, поступление летом',tip:'Планируй подготовку к ЕНТ по профильным предметам, смотри проходные баллы прошлых лет.'},
+{id:'bol',n:'Болашак',c:'Казахстан → за рубеж',l:'Магистратура, PhD',f:'Полное',v:'g',url:'https://bolashak.gov.kz',
+ rq:['Для школьников не подходит: нужен диплом бакалавра и стаж по условиям программы','Английский и приглашение вуза'],
+ tm:'Через несколько лет, после бакалавра',tip:'Это цель на потом: сейчас важно хорошо учиться в бакалавриате.'},
+{id:'us',n:'США: вузы с полной помощью по нужде',c:'США',l:'Бакалавриат',f:'Полное/частичное по нужде',v:'g',url:'https://commonapp.org',
+ rq:['Эссе, рекомендации, внеклассные достижения','IELTS/TOEFL; требования к SAT/ACT у вузов разные','Документы о доходе семьи'],
+ tm:'Раннее подача обычно 1 ноября, основная 1–15 января',tip:'Начни проекты и волонтёрство сейчас, поднимай английский до 7.0+ IELTS.'},
+{id:'de',n:'Германия: бесплатные вузы и DAAD',c:'Германия',l:'Бакалавриат',f:'Низкая плата, стипендии редки',v:'g',url:'https://www.daad.de',
+ rq:['Для выпускников многих стран нужен подготовительный курс (Studienkolleg) или курсы вуза','Немецкий (B1–C1) или английская программа с IELTS'],
+ tm:'Подача обычно за 6–9 месяцев до начала семестра',tip:'Выбери язык обучения: немецкий или английский, и начни его учить.'}
+];
+const dbBrief=()=>DB.map(p=>`[${p.id}] ${p.n}; ${p.c}; ${p.l}; ${p.f}; требования: ${p.rq.join(' | ')}; сроки: ${p.tm}`).join('\n');
+const SYS='Ты — ИИ-куратор поступления для школьника 10 класса из Казахстана. Задавай по одному короткому вопросу: интересы, предметы, оценки, кружки и олимпиады, языки, бюджет, страны. Когда узнаешь достаточно, предложи до 5 вариантов ТОЛЬКО из базы ниже (реалистичные, средние, «мечта»), к каждому одна строка «почему подходит». Если нужного варианта в базе нет, так и скажи и посоветуй проверить на официальном сайте. Никогда не выдумывай даты, баллы и требования, которых нет в базе. Отвечай по-русски, коротко.\n\nБаза:\n'+dbBrief();
+const FREE=5;
+let S={msgs:[],goal:'',gaps:[],steps:[],done:{},used:0,free:true,prof:{},res:null},owner=false,tab='chat',busy=false,sample=null,flt='Все';
+try{const r=localStorage.getItem('zhol2');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem('zhol2',JSON.stringify(S))}catch(e){}};
+S.prof=S.prof||{};tab=S.prof.done?'res':'survey';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const unl=()=>owner&&S.free;
+const transcript=()=>S.msgs.map(m=>(m.r==='u'?'Ученик: ':'Куратор: ')+m.t).join('\n');
+function render(){
+ $('mode').textContent=unl()?'админ · бесплатно':'бета';
+ $('s1').className='st'+(S.prof.done?' d':'');$('s2').className='st'+(S.res?' d':'');$('s3').className='st'+(S.steps.length?' d':'');
+ const T=[['survey','📝 Анкета'],['res','🎯 Шансы'],['chat','💬 Чат'],['base','📚 База'],['goal','🚩 Цель'],['plan','✅ План']];if(owner)T.push(['admin','Админ']);
+ $('nav').innerHTML=T.map(t=>`<button class="${tab===t[0]?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+ $('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
+ ({survey:vSurvey,res:vRes,chat:vChat,base:vBase,goal:vGoal,plan:vPlan,admin:vAdmin})[tab]();
+}
+const Q=[
+{k:'cls',t:'В каком ты классе?',type:'one',o:['9','10','11','Выпускник']},
+{k:'en',t:'Какой у тебя уровень английского?',type:'one',o:['A1–A2 (начальный)','B1 (средний)','B2 (выше среднего)','C1+ (продвинутый)']},
+{k:'gpa',t:'Твой средний балл',type:'gpa'},
+{k:'int',t:'Что тебе интересно? (можно несколько)',type:'multi',o:['IT и программирование','Инженерия','Медицина','Бизнес и экономика','Естественные науки','Гуманитарные науки','Дизайн и искусство']},
+{k:'ach',t:'Что уже есть в портфолио? (можно несколько)',type:'multi',o:['Олимпиады','Проекты или стартапы','Волонтёрство','Спорт','Творчество','Сертификаты по языкам','Пока ничего']},
+{k:'bud',t:'Как с финансами на учёбу?',type:'one',o:['Нужно полное финансирование','Могу оплатить часть','Могу оплачивать сам']},
+{k:'ctr',t:'В какие страны хочешь? (можно несколько)',type:'multi',o:['Корея','Турция','Венгрия','Китай','Япония','Казахстан','США','Германия','Любая']}];
+const profTxt=()=>{const p=S.prof;return `класс ${p.cls}; английский ${p.en}${p.ielts?', IELTS '+p.ielts:''}; средний балл ${p.gpa} (${p.sc}); интересы: ${(p.int||[]).join(', ')}; в портфолио: ${(p.ach||[]).join(', ')}; финансы: ${p.bud}; страны: ${(p.ctr||[]).join(', ')}`};
+function vSurvey(){
+ const P=S.prof,i=P.step||0,q=Q[i];let b='';
+ if(q.type==='gpa')b=`<div class="row"><input type="text" id="gv" inputmode="decimal" placeholder="Например 4.6" value="${esc(P.gpa||'')}"><select id="gs" style="max-width:150px">${['5-балльная','100%','4.0'].map(s=>`<option ${P.sc===s?'selected':''}>${s}</option>`).join('')}</select></div>`;
+ else b=`<div class="chips" style="gap:8px">${q.o.map(o=>{const on=q.type==='multi'?(P[q.k]||[]).includes(o):P[q.k]===o;return `<button class="btn ${on?'p':''}" data-o="${esc(o)}">${esc(o)}</button>`}).join('')}</div>`;
+ if(q.k==='en')b+=`<div class="mut" style="margin:14px 0 6px">Сдавал IELTS? Впиши балл (необязательно)</div><input type="text" id="ie" inputmode="decimal" placeholder="Например 6.5" value="${esc(P.ielts||'')}">`;
+ $('v').innerHTML=`<div class="card"><div class="bar"><i style="width:${Math.round((i+1)/Q.length*100)}%"></i></div><div class="mut" style="margin:6px 0 10px">Вопрос ${i+1} из ${Q.length}</div><h2>${esc(q.t)}</h2>${b}<div id="er" class="mut" style="color:var(--hi);margin-top:8px"></div><div class="row" style="margin-top:14px">${i?'<button class="btn" id="bk">Назад</button>':''}<button class="btn p" id="nx">${i===Q.length-1?'Показать шансы 🚀':'Дальше →'}</button></div></div>`;
+ $('v').querySelectorAll('[data-o]').forEach(x=>x.onclick=()=>{const o=x.dataset.o;if(q.type==='multi'){const a=P[q.k]||[];P[q.k]=a.includes(o)?a.filter(y=>y!==o):[...a,o]}else P[q.k]=o;vSurvey()});
+ if($('bk'))$('bk').onclick=()=>{rd();P.step=i-1;save();vSurvey()};
+ function rd(){if($('ie'))P.ielts=$('ie').value.trim();if($('gv')){P.gpa=$('gv').value.trim().replace(',','.');P.sc=$('gs').value}}
+ $('nx').onclick=()=>{rd();
+  if(q.type==='gpa'){const n=parseFloat(P.gpa),mx=P.sc==='100%'?100:P.sc==='4.0'?4:5;if(!(n>0&&n<=mx)){$('er').textContent='Введи число от 0 до '+mx;return}}
+  else if(q.type==='multi'){if(!(P[q.k]||[]).length){$('er').textContent='Выбери хотя бы один вариант';return}}
+  else if(!P[q.k]){$('er').textContent='Выбери вариант';return}
+  if(i<Q.length-1){P.step=i+1;save();vSurvey()}else{P.done=true;S.res=null;save();runMatch()}};
+}
+async function runMatch(){
+ if(busy)return;tab='res';render();const el=$('rr');
+ if(!sample){el.innerHTML='<div class="card mut">ИИ недоступен в этом режиме просмотра.</div>';return}
+ busy=true;el.innerHTML='<div class="card mut">ИИ анализирует твой профиль…</div>';
+ const q=`Ты куратор поступления. Профиль ученика из Казахстана: ${profTxt()}.\nБаза программ:\n${dbBrief()}\n\nВыбери 4–6 программ из базы, где у ученика реалистичные шансы, и оцени шанс как «высокий», «средний» или «низкий» ТОЛЬКО по требованиям из базы и профилю. Не обещай поступление и не выдумывай баллы. Не включай программы, которые ученику по уровню не подходят (например Болашак для школьника). Учти страны и финансы. Верни ТОЛЬКО JSON без markdown: {"summary":"2 предложения: сильные стороны и главный пробел","matches":[{"id":"id из базы","chance":"высокий|средний|низкий","why":"почему","missing":"чего не хватает"}]}`;
+ try{S.res=await sample.json(q,{cache:false});save()}catch(e){busy=false;el.innerHTML='<div class="card mut">Не получилось. Попробуй ещё раз.</div><button class="btn p" id="rt">Повторить</button>';$('rt').onclick=runMatch;return}
+ busy=false;render();
+}
+function vRes(){
+ if(!S.prof.done){$('v').innerHTML='<div class="card"><h2>Сначала пройди анкету</h2><button class="btn p" id="sv">К анкете</button></div>';$('sv').onclick=()=>{tab='survey';render()};return}
+ const R=S.res;
+ const m=(R&&R.matches||[]).map(x=>{const p=DB.find(d=>d.id===x.id);if(!p)return'';const c=x.chance||'';return `<div class="card"><h2>${esc(p.n)}</h2><div class="chips"><span class="chip ${c==='высокий'?'':c==='низкий'?'hi':'o'}">шанс: ${esc(c)}</span><span class="chip o">${esc(p.c)}</span><span class="chip o">${esc(p.f)}</span></div><div>${esc(x.why)}</div><div class="mut" style="margin-top:6px"><b>Чего не хватает:</b> ${esc(x.missing)}</div><div class="row" style="margin-top:10px"><button class="btn p" data-g="${p.id}">Выбрать целью</button><a class="btn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Сайт</a></div></div>`}).join('');
+ $('v').innerHTML=`<div id="rr">${R?`<div class="card"><h2>Твои шансы</h2><div>${esc(R.summary)}</div></div><div class="warn">Это ориентировочная оценка ИИ по данным базы, а не гарантия поступления. Условия проверяй на официальных сайтах.</div>${m}`:'<div class="card"><button class="btn p" id="ru">Показать шансы</button></div>'}<button class="btn" id="rs2">Пройти анкету заново</button></div>`;
+ if($('ru'))$('ru').onclick=runMatch;
+ $('rs2').onclick=()=>{S.prof={};S.res=null;save();tab='survey';render()};
+ $('v').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.goal=b.dataset.g;save();tab='goal';render()});
+}
+function vChat(){
+ const left=unl()?'∞':Math.max(0,FREE-S.used);
+ $('v').innerHTML=`<div class="card"><div id="log">${S.msgs.length?'':'<div class="m a">Привет! 👋 Расскажи, что тебе интересно, и я подкину варианты из нашей базы программ.</div>'}${S.msgs.map(m=>`<div class="m ${m.r}">${esc(m.t)}</div>`).join('')}</div>
+ <div class="row"><input type="text" id="in" placeholder="Напиши сообщение…"><button class="btn p" id="go">Отправить</button></div>
+ <div class="mut" style="margin-top:8px">Бесплатных сообщений: ${left}</div></div><div id="pay"></div>`;
+ $('go').onclick=send;$('in').onkeydown=e=>{if(e.key==='Enter')send()};const l=$('log');l.scrollTop=l.scrollHeight;
+}
+function paywall(el){el.innerHTML='<div class="card"><h2>Лимит бесплатных сообщений</h2><p class="mut">Premium: безлимитный чат, анализ пробелов и план. Оплата через Kaspi появится в следующей версии.</p><button class="btn" disabled>Оплатить через Kaspi (скоро)</button></div>'}
+async function send(){
+ const t=$('in').value.trim();if(!t||busy)return;
+ if(!unl()&&S.used>=FREE){paywall($('pay'));return}
+ if(!sample){$('pay').innerHTML='<div class="card mut">ИИ недоступен в этом режиме просмотра.</div>';return}
+ busy=true;S.msgs.push({r:'u',t},{r:'a',t:'…'});S.used++;vChat();
+ const h=S.msgs.slice(0,-1).map((m,i)=>({role:m.r==='u'?'user':'assistant',content:(i===0?SYS+'\n\nПрофиль ученика: '+(S.prof.done?profTxt():'не заполнен')+'\n\nПервое сообщение ученика: ':'')+m.t}));
+ try{const o=await sample(h,{cache:false,onText:({text})=>{S.msgs[S.msgs.length-1].t=text;const l=$('log');if(l&&l.lastChild){l.lastChild.textContent=text;l.scrollTop=l.scrollHeight}}});S.msgs[S.msgs.length-1].t=o.text}
+ catch(e){S.msgs[S.msgs.length-1].t='Не получилось ответить. Попробуй ещё раз.'}
+ busy=false;save();vChat();
+}
+function vBase(){
+ const cs=['Все',...new Set(DB.map(p=>p.c))];
+ $('v').innerHTML=`<div class="warn">Данные обновлены ${CHK}. Пометка «сверено» значит, что условия сверены с источниками в интернете, в основном неофициальными. Остальное даётся ориентиром: сроки и баллы меняются, всегда проверяй на официальном сайте.</div>
+ <div class="fl">${cs.map(c=>`<button class="btn ${flt===c?'p':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+ ${DB.filter(p=>flt==='Все'||p.c===flt).map(p=>`<div class="card pr"><h2><span>${esc(p.n)}</span></h2>
+ <div class="chips"><span class="chip">${esc(p.c)}</span><span class="chip o">${esc(p.l)}</span><span class="chip o">${esc(p.f)}</span><span class="chip ${p.v==='v'?'':'hi'}">${p.v==='v'?'сверено':'проверить'}</span></div>
+ <ul class="rq">${p.rq.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+ <div class="mut"><b>Сроки:</b> ${esc(p.tm)}</div><div style="margin-top:6px"><b>Что делать в 10 классе:</b> ${esc(p.tip)}</div>
+ <div style="margin-top:8px"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">Официальный сайт</a></div></div>`).join('')}`;
+ $('v').querySelectorAll('.fl button').forEach(b=>b.onclick=()=>{flt=b.dataset.c;vBase()});
+}
+function vGoal(){
+ $('v').innerHTML=`<div class="card"><h2>Твоя цель</h2><div class="row"><select id="g"><option value="">Выбери программу из базы</option>${DB.map(p=>`<option value="${p.id}" ${S.goal===p.id?'selected':''}>${esc(p.n)}</option>`).join('')}</select><button class="btn p" id="an">Анализ</button></div>
+ <div class="mut" style="margin-top:8px">Агент сравнит твой профиль из чата с требованиями выбранной программы.</div></div><div id="res">${S.gaps.map(g=>`<div class="card"><div class="chips"><span class="chip ${g.level==='high'?'hi':''}">${g.level==='high'?'главное':g.level==='mid'?'важно':'желательно'}</span></div><b>${esc(g.area)}</b><div class="mut">Сейчас: ${esc(g.now)}<br>Нужно: ${esc(g.need)}</div></div>`).join('')}</div>`;
+ $('an').onclick=analyze;
+}
+async function analyze(){
+ const id=$('g').value,p=DB.find(x=>x.id===id);if(!p||busy)return;
+ if(!S.prof.done){$('res').innerHTML='<div class="card mut">Сначала пройди анкету.</div>';return}
+ if(!sample)return;S.goal=id;busy=true;$('res').innerHTML='<div class="card mut">Анализирую…</div>';
+ const q=`Ты куратор поступления. Профиль ученика из Казахстана: ${profTxt()}\nДиалог с агентом:\n${transcript()}\n\nЦель: ${p.n} (${p.c}). Требования из базы: ${p.rq.join(' | ')}. Сроки: ${p.tm}.\nСравни профиль и требования. Используй только факты из базы, где данных нет, пиши «проверить на сайте». Верни ТОЛЬКО JSON без пояснений и markdown: {"gaps":[{"area":"","now":"","need":"","level":"high|mid|low"}],"steps":[{"when":"срок","task":"конкретное действие"}]}. 3–5 пробелов, 5–8 шагов.`;
+ try{const j=await sample.json(q,{cache:false});S.gaps=j.gaps||[];S.steps=j.steps||[];S.done={}}
+ catch(e){$('res').innerHTML='<div class="card mut">Не получилось. Попробуй ещё раз.</div>';busy=false;return}
+ busy=false;save();render();
+}
+function vPlan(){
+ if(!S.steps.length){$('v').innerHTML='<div class="card mut">Плана пока нет. Выбери цель во вкладке «Цель».</div>';return}
+ const p=DB.find(x=>x.id===S.goal),n=S.steps.filter((_,i)=>S.done[i]).length,pc=Math.round(n/S.steps.length*100);
+ $('v').innerHTML=`<div class="card"><h2>План: ${esc(p?p.n:'')}</h2><div class="bar"><i style="width:${pc}%"></i></div><div class="mut" style="margin-top:6px">Выполнено ${n} из ${S.steps.length}</div></div>
+ <div class="card">${S.steps.map((s,i)=>`<label class="ck"><input type="checkbox" data-i="${i}" ${S.done[i]?'checked':''}><span><b>${esc(s.when)}</b><br>${esc(s.task)}</span></label>`).join('')}</div>`;
+ $('v').querySelectorAll('input').forEach(c=>c.onchange=()=>{S.done[c.dataset.i]=c.checked;save();vPlan()});
+}
+function vAdmin(){
+ $('v').innerHTML=`<div class="card"><h2>Админ-панель (временная)</h2>
+ <label class="ck"><input type="checkbox" id="fr" ${S.free?'checked':''}><span>Всё бесплатно для меня (без лимита сообщений)</span></label>
+ <div class="row" style="margin-top:10px"><button class="btn" id="rs">Сбросить счётчик</button><button class="btn" id="rd">Сбросить все данные</button></div>
+ <p class="mut">Видна только владельцу страницы. Это не настоящая защита: для платежей и лимитов нужен сервер.</p></div>`;
+ $('fr').onchange=e=>{S.free=e.target.checked;save();render()};$('rs').onclick=()=>{S.used=0;save();render()};
+ $('rd').onclick=()=>{S={msgs:[],goal:'',gaps:[],steps:[],done:{},used:0,free:true,prof:{},res:null};save();tab='survey';render()};
+}
+render();
+(async()=>{try{const u=await claude.use('user');owner=u?u.isOwner():false;sample=await claude.use('sample');render()}catch(e){}})();
+</script></body></html>
